@@ -5,11 +5,8 @@
 #include <iostream>
 #include <sstream>
 
-static const SDL_Scancode KEY_START = SDL_SCANCODE_RETURN;
-static const SDL_Scancode KEY_QUIT = SDL_SCANCODE_ESCAPE;
 static const SDL_Scancode KEY_NEXT = SDL_SCANCODE_SPACE;
-static const SDL_Scancode KEY_ERASE = SDL_SCANCODE_BACKSPACE;
-static const SDL_Scancode KEY_SAVE = SDL_SCANCODE_F2;
+static const SDL_Scancode KEY_ERASE = SDL_SCANCODE_ESCAPE;
 
 void SplitsScreen::init() {
   index_ = time_ = 0;
@@ -31,9 +28,6 @@ bool SplitsScreen::load_splits(const std::string& file) {
   splits_.emplace_back("Gem 6");
   splits_.emplace_back("Dark Link");
 
-  mode_ = title_.find("Rando") == std::string::npos ?
-    ComparisonMode::BEST : ComparisonMode::AVERAGE;
-
   return true;
 }
 
@@ -42,15 +36,11 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     splits_[index_].current += elapsed;
     time_ += elapsed;
 
-    if (input.key_pressed(KEY_START)) stop();
-    if (input.key_pressed(KEY_QUIT)) reset();
     if (input.key_pressed(KEY_NEXT)) next();
     if (input.key_pressed(KEY_ERASE)) back();
   } else {
-    if (input.key_pressed(KEY_START)) go();
+    if (input.key_pressed(KEY_NEXT)) go();
     if (input.key_pressed(KEY_ERASE)) reset();
-    if (input.key_pressed(KEY_SAVE)) save();
-    if (input.key_pressed(KEY_QUIT)) return false;
   }
 
   return true;
@@ -69,25 +59,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
     text_->draw(graphics, s.name, 16, y);
 
-    if (i <= index_) {
-      draw_time(graphics, s.current, right, y);
-
-      if (s.count > 0) {
-        int compare = 0;
-
-        switch (mode_) {
-          case ComparisonMode::AVERAGE:
-            compare = s.current - s.average;
-            break;
-
-          case ComparisonMode::BEST:
-            compare = s.current - s.best;
-            break;
-        }
-
-        draw_time(graphics, compare, right - 80, y);
-      }
-    }
+    if (i <= index_) draw_time(graphics, s.current, right, y);
   }
 
   draw_time(graphics, time_, right, bottom);
@@ -111,12 +83,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
   draw_vline(graphics, graphics.width() - 6, 32, graphics.height() - 41);
 }
 
-SplitsScreen::Split::Split(const std::string& name) :
-  name(name), count(0), best(0), average(0), current(0) {}
-
-SplitsScreen::Split::Split(
-    const std::string& name, int count, int best, int average) :
-  name(name), count(count), best(best), average(average), current(0) {}
+SplitsScreen::Split::Split(const std::string& name) : name(name), current(0) {}
 
 void SplitsScreen::stop() {
   running_ = false;
@@ -143,22 +110,9 @@ void SplitsScreen::back() {
     splits_[index_ - 1].current += splits_[index_].current;
     splits_[index_].current = 0;
     --index_;
+  } else {
+    stop();
   }
-}
-
-void SplitsScreen::save() {
-  for (size_t i = 0; i < splits_.size(); ++i) {
-    Split* s = &splits_[i];
-    const int t = s->count * s->average + s->current;
-
-    s->count++;
-    s->average = t / s->count;
-    s->best = s->current;
-
-    // if (s->current < s->best || s->best == 0) s->best = s->current;
-  }
-
-  reset();
 }
 
 void SplitsScreen::draw_time(

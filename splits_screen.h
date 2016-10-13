@@ -23,19 +23,15 @@ class SplitsScreen : public Screen {
 
     struct Split {
       Split(const std::string& name);
-      Split(const std::string& name, int count, int best, int average);
       std::string name;
-      unsigned int count, best, average, current;
+      unsigned int current;
     };
-
-    enum class ComparisonMode { BEST, AVERAGE };
 
     std::string title_, file_;
     std::vector<Split> splits_;
     unsigned int index_, time_;
     bool running_;
     std::unique_ptr<Text> text_;
-    ComparisonMode mode_;
 
     void stop();
     void reset();
