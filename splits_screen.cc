@@ -53,16 +53,17 @@ void SplitsScreen::draw(Graphics& graphics) const {
   const int right = graphics.width() - 16;
   const int bottom = graphics.height() - 32;
 
+  unsigned int total = 0;
   for (size_t i = 0; i < splits_.size(); ++i) {
     const Split s = splits_[i];
     const int y = 16 * i + 40;
 
+    total += s.current;
+
     text_->draw(graphics, s.name, 16, y);
 
-    if (i <= index_) draw_time(graphics, s.current, right, y);
+    if (i <= index_) draw_time(graphics, total, right, y);
   }
-
-  draw_time(graphics, time_, right, bottom);
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
