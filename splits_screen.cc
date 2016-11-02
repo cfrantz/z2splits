@@ -12,7 +12,7 @@ void SplitsScreen::init() {
   index_ = time_ = 0;
   running_ = false;
 
-  text_.reset(new Text("text"));
+  text_.reset(new Text("text.png"));
 }
 
 bool SplitsScreen::load_splits(const std::string& file) {

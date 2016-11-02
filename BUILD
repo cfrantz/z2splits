@@ -5,6 +5,7 @@ cc_binary(
     data = ["//content"],
     linkopts = [
         "-lSDL2",
+        "-lSDL2_image",
         "-lSDL2_mixer",
     ],
     srcs = ["main.cc"],
