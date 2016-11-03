@@ -8,6 +8,7 @@
 #include "input.h"
 #include "graphics.h"
 #include "screen.h"
+#include "spritemap.h"
 #include "text.h"
 
 class SplitsScreen : public Screen {
@@ -30,15 +31,17 @@ class SplitsScreen : public Screen {
     std::string title_, file_;
     std::vector<Split> splits_;
     unsigned int index_, time_;
-    bool running_;
+    bool running_, killed_[7];
     std::unique_ptr<Text> text_;
+    std::unique_ptr<SpriteMap> bosses_;
 
     void stop();
     void reset();
     void go();
     void next();
     void back();
-    void save();
+
+    void toggle_boss(int boss);
 
     void draw_time(Graphics& graphics, int ms, int x, int y) const;
 

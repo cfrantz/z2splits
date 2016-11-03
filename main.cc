@@ -7,7 +7,7 @@ int main(int, char**) {
 
   config.graphics.title = "splits";
   config.graphics.width = 256;
-  config.graphics.height = 256;
+  config.graphics.height = 384;
   config.graphics.fullscreen = false;
 
   SplitsScreen *s = new SplitsScreen();

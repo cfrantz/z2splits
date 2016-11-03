@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "splits",
+    name = "z2splits",
     data = ["//content"],
     linkopts = [
         "-lSDL2",
@@ -21,6 +21,7 @@ cc_library(
     hdrs = ["splits_screen.h"],
     deps = [
         "@libgam//:screen",
+        "@libgam//:spritemap",
         "@libgam//:text",
     ],
 )
