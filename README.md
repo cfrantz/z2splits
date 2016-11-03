@@ -9,11 +9,15 @@ features are planned for the future.
 
 When stopped:
 
+|Key        |Action|
+|-----------|------|
 |Space      |Start timer|
 |Escape     |Reset tracker|
 
 When running:
 
+|Key        |Action|
+|-----------|------|
 |Space      |Next split|
 |Backspace  |Previous split|
 |Return     |Stop timer|
