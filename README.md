@@ -2,6 +2,8 @@
 
 A splits and item tracker for Zelda 2 Randomizer.
 
+![screenshot](https://raw.github.com/bentglasstube/z2splits/master/screenshot.png)
+
 Tracks your time for each gem placement and which bosses you have killed.  More
 features are planned for the future.
 
