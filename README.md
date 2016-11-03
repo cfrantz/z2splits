@@ -9,16 +9,15 @@ features are planned for the future.
 
 When stopped:
 
-  Space     Start timer
-  Escape    Reset tracker
+|Space      |Start timer|
+|Escape     |Reset tracker|
 
 When running:
 
-  Space       Next split
-  Backspace   Previous split
-  Return      Stop timer
-
-  1-7         Toggle bosses
+|Space      |Next split|
+|Backspace  |Previous split|
+|Return     |Stop timer|
+|1-7        |Toggle bosses|
 
 ## Planned Features
 
