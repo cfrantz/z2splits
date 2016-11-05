@@ -13,21 +13,46 @@ void SplitsScreen::init() {
   running_ = false;
 
   text_.reset(new Text("text.png"));
-  bosses_.reset(new SpriteMap("bosses.png", 8, 32, 48));
+  maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
 }
 
 bool SplitsScreen::load_splits(const std::string& file) {
   file_ = file;
 
-  title_ = "Zelda 2 Randomizer";
+  title_ = "Zelda 2 All Keys";
 
-  splits_.emplace_back("Gem 1");
-  splits_.emplace_back("Gem 2");
-  splits_.emplace_back("Gem 3");
-  splits_.emplace_back("Gem 4");
-  splits_.emplace_back("Gem 5");
-  splits_.emplace_back("Gem 6");
-  splits_.emplace_back("Dark Link");
+  splits_.emplace_back("Magic", 0);
+  splits_.emplace_back("Rauru", 0);
+  splits_.emplace_back("Desert Heart", 0);
+  splits_.emplace_back("Palace 1", 1);
+  splits_.emplace_back("Trophy", 0);
+  splits_.emplace_back("Ruto", 0);
+  splits_.emplace_back("Swamp 1 Up", 0);
+  splits_.emplace_back("Bagu", 0);
+  splits_.emplace_back("Saria", 0);
+  splits_.emplace_back("Hammer", 0);
+  splits_.emplace_back("Rock Magic", 0);
+  splits_.emplace_back("Desert 1 Up", 0);
+  splits_.emplace_back("Cave Heart", 0);
+  splits_.emplace_back("Medicine", 0);
+  splits_.emplace_back("Mido", 0);
+  splits_.emplace_back("Palace 2", 2);
+  splits_.emplace_back("Palace 3", 3);
+  splits_.emplace_back("Nabooru Fire", 0);
+  splits_.emplace_back("Desert 1 Up", 0);
+  splits_.emplace_back("Pit Magic", 0);
+  splits_.emplace_back("Boots", 0);
+  splits_.emplace_back("Child", 0);
+  splits_.emplace_back("Darunia", 0);
+  splits_.emplace_back("Palace 4", 4);
+  splits_.emplace_back("Ocean Heart", 0);
+  splits_.emplace_back("Palace 5", 5);
+  splits_.emplace_back("Swamp 1 Up", 0);
+  splits_.emplace_back("New Kasuto", 0);
+  splits_.emplace_back("Desert Heart", 0);
+  splits_.emplace_back("Palace 6", 6);
+  splits_.emplace_back("Kasuto", 0);
+  splits_.emplace_back("Palace 7", 0);
 
   return true;
 }
@@ -40,14 +65,6 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     if (input.key_pressed(SDL_SCANCODE_SPACE)) next();
     if (input.key_pressed(SDL_SCANCODE_BACKSPACE)) back();
     if (input.key_pressed(SDL_SCANCODE_RETURN)) stop();
-
-    if (input.key_pressed(SDL_SCANCODE_1)) toggle_boss(0);
-    if (input.key_pressed(SDL_SCANCODE_2)) toggle_boss(1);
-    if (input.key_pressed(SDL_SCANCODE_3)) toggle_boss(2);
-    if (input.key_pressed(SDL_SCANCODE_4)) toggle_boss(3);
-    if (input.key_pressed(SDL_SCANCODE_5)) toggle_boss(4);
-    if (input.key_pressed(SDL_SCANCODE_6)) toggle_boss(5);
-    if (input.key_pressed(SDL_SCANCODE_7)) toggle_boss(6);
 
   } else {
     if (input.key_pressed(SDL_SCANCODE_SPACE)) go();
@@ -64,16 +81,27 @@ void SplitsScreen::draw(Graphics& graphics) const {
   const int right = graphics.width() - 16;
 
   unsigned int total = 0;
+  int offset = 0;
+  const int max_shown = 16;
+
+  if (splits_.size() > max_shown) {
+    offset = index_ - max_shown + 1;
+    if (offset < 0) offset = 0;
+  }
+
   for (size_t i = 0; i < splits_.size(); ++i) {
     const Split s = splits_[i];
-    const int y = 16 * i + 40;
+    const int y = 16 * (i - offset) + 40;
 
     total += s.current;
 
-    text_->draw(graphics, s.name, 16, y);
-
-    if (i <= index_) draw_time(graphics, total, right, y);
+    if (i >= offset && i < offset + max_shown) {
+      text_->draw(graphics, s.name, 16, y);
+      if (i <= index_) draw_time(graphics, total, right, y);
+    }
   }
+
+  maps_->draw(graphics, splits_[index_].hint, 0, graphics.height() - 72);
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
@@ -93,19 +121,11 @@ void SplitsScreen::draw(Graphics& graphics) const {
   draw_vline(graphics, 2, 32, graphics.height() - 41);
   draw_vline(graphics, graphics.width() - 6, 32, graphics.height() - 41);
 
-  for (int i = 0; i < 7; ++i) {
-    const int x = graphics.width() * (i + 1) / 8 - 16;
-    const int y = graphics.height() - 64;
-    if (killed_[i]) {
-      bosses_->draw(graphics, i + 8, x, y);
-      bosses_->draw(graphics, 7, x, y);
-    } else {
-      bosses_->draw(graphics, i, x, y);
-    }
-  }
+  // TODO draw hint
 }
 
-SplitsScreen::Split::Split(const std::string& name) : name(name), current(0) {}
+SplitsScreen::Split::Split(const std::string& name, int hint=-1) :
+  name(name), current(0), hint(hint) {}
 
 void SplitsScreen::stop() {
   running_ = false;
@@ -115,7 +135,6 @@ void SplitsScreen::reset() {
   running_ = false;
   index_ = time_ = 0;
   for (size_t i = 0; i < splits_.size(); ++i) splits_[i].current = 0;
-  for (int i = 0; i < 7; ++i) killed_[i] = false;
 }
 
 void SplitsScreen::go() {
@@ -136,10 +155,6 @@ void SplitsScreen::back() {
   } else {
     stop();
   }
-}
-
-void SplitsScreen::toggle_boss(int boss) {
-  killed_[boss] = !killed_[boss];
 }
 
 void SplitsScreen::draw_time(

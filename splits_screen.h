@@ -23,25 +23,24 @@ class SplitsScreen : public Screen {
   private:
 
     struct Split {
-      Split(const std::string& name);
+      Split(const std::string& name, int hint);
       std::string name;
       unsigned int current;
+      int hint;
     };
 
     std::string title_, file_;
     std::vector<Split> splits_;
     unsigned int index_, time_;
-    bool running_, killed_[7];
+    bool running_;
     std::unique_ptr<Text> text_;
-    std::unique_ptr<SpriteMap> bosses_;
+    std::unique_ptr<SpriteMap> maps_;
 
     void stop();
     void reset();
     void go();
     void next();
     void back();
-
-    void toggle_boss(int boss);
 
     void draw_time(Graphics& graphics, int ms, int x, int y) const;
 
