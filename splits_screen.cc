@@ -37,17 +37,33 @@ bool SplitsScreen::load_splits(const z2splits::Config& config) {
 }
 
 bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
+  z2splits::ControlAction action;
   if (running_) {
     splits_[index_].set_time_ms(splits_[index_].time_ms() + elapsed);
     time_ += elapsed;
 
-    if (input.key_pressed(SDL_SCANCODE_SPACE)) next();
-    if (input.key_pressed(SDL_SCANCODE_BACKSPACE)) back();
-    if (input.key_pressed(SDL_SCANCODE_RETURN)) stop();
-
+    for(const auto& c : config_.controls()) {
+        action = input.key_pressed(SDL_Scancode(c.scancode())) ?
+                 c.action() : z2splits::ControlAction::UNKNOWN;
+        switch(action) {
+          case z2splits::ControlAction::SPLIT: next(); break;
+          case z2splits::ControlAction::BACK: back(); break;
+          case z2splits::ControlAction::STOP: stop(); break;
+          default:
+            ; // do nothing
+        }
+    }
   } else {
-    if (input.key_pressed(SDL_SCANCODE_SPACE)) go();
-    if (input.key_pressed(SDL_SCANCODE_ESCAPE)) reset();
+    for(const auto& c : config_.controls()) {
+        action = input.key_pressed(SDL_Scancode(c.scancode())) ?
+                 c.action() : z2splits::ControlAction::UNKNOWN;
+        switch(action) {
+          case z2splits::ControlAction::SPLIT: go(); break;
+          case z2splits::ControlAction::RESET: reset(); break;
+          default:
+            ; // do nothing
+        }
+    }
   }
 
   return true;
