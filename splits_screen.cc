@@ -82,7 +82,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   unsigned int total = 0;
   int offset = 0;
-  const int max_shown = 16;
+  const int max_shown = (graphics.height() - 144) / 16;
 
   if (splits_.size() > max_shown) {
     offset = index_ - max_shown + 1;
@@ -101,7 +101,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
     }
   }
 
-  maps_->draw(graphics, splits_[index_].hint, 0, graphics.height() - 72);
+  maps_->draw(graphics, splits_[index_].hint, 8, graphics.height() - 72);
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
