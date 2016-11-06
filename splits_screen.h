@@ -23,9 +23,9 @@ class SplitsScreen : public Screen {
   private:
 
     struct Split {
-      Split(const std::string& name, int hint);
+      Split(const std::string& name, unsigned int best, int hint);
       std::string name;
-      unsigned int current;
+      unsigned int current, best;
       int hint;
     };
 

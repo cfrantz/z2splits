@@ -21,38 +21,38 @@ bool SplitsScreen::load_splits(const std::string& file) {
 
   title_ = "Zelda 2 All Keys";
 
-  splits_.emplace_back("Magic", 0);
-  splits_.emplace_back("Shield", 0);
-  splits_.emplace_back("Desert Heart", 0);
-  splits_.emplace_back("Palace 1", 1);
-  splits_.emplace_back("Trophy", 0);
-  splits_.emplace_back("Jump", 0);
-  splits_.emplace_back("Swamp 1 Up", 0);
-  splits_.emplace_back("Bagu", 0);
-  splits_.emplace_back("Life", 0);
-  splits_.emplace_back("Hammer", 0);
-  splits_.emplace_back("Rock Magic", 0);
-  splits_.emplace_back("Desert 1 Up", 0);
-  splits_.emplace_back("Cave Heart", 0);
-  splits_.emplace_back("Medicine", 0);
-  splits_.emplace_back("Fairy", 0);
-  splits_.emplace_back("Palace 2", 2);
-  splits_.emplace_back("Palace 3", 3);
-  splits_.emplace_back("Fire", 0);
-  splits_.emplace_back("Desert 1 Up", 0);
-  splits_.emplace_back("Pit Magic", 0);
-  splits_.emplace_back("Boots", 4);
-  splits_.emplace_back("Child", 0);
-  splits_.emplace_back("Reflect", 0);
-  splits_.emplace_back("Palace 4", 4);
-  splits_.emplace_back("Ocean Heart", 0);
-  splits_.emplace_back("Palace 5", 5);
-  splits_.emplace_back("Swamp 1 Up", 0);
-  splits_.emplace_back("Spell", 0);
-  splits_.emplace_back("Desert Heart", 0);
-  splits_.emplace_back("Palace 6", 6);
-  splits_.emplace_back("Thunder", 0);
-  splits_.emplace_back("Palace 7", 0);
+  splits_.emplace_back("Magic", 0, 0);
+  splits_.emplace_back("Trophy", 0, 0);
+  splits_.emplace_back("Shield", 0, 0);
+  splits_.emplace_back("Desert Heart", 0, 0);
+  splits_.emplace_back("Palace 1", 0, 1);
+  splits_.emplace_back("Jump", 0, 0);
+  splits_.emplace_back("Swamp 1 Up", 0, 0);
+  splits_.emplace_back("Bagu", 0, 0);
+  splits_.emplace_back("Life", 0, 0);
+  splits_.emplace_back("Hammer", 0, 0);
+  splits_.emplace_back("Rock Magic", 0, 0);
+  splits_.emplace_back("Desert 1 Up", 0, 0);
+  splits_.emplace_back("Cave Heart", 0, 0);
+  splits_.emplace_back("Medicine", 0, 0);
+  splits_.emplace_back("Fairy", 0, 0);
+  splits_.emplace_back("Palace 2", 0, 2);
+  splits_.emplace_back("Palace 3", 0, 3);
+  splits_.emplace_back("Fire", 0, 0);
+  splits_.emplace_back("Desert 1 Up", 67000, 0);
+  splits_.emplace_back("Pit Magic", 38000, 0);
+  splits_.emplace_back("Boots", 225000, 4);
+  splits_.emplace_back("Child", 199000, 0);
+  splits_.emplace_back("Reflect", 152000, 0);
+  splits_.emplace_back("Palace 4", 335000, 4);
+  splits_.emplace_back("Ocean Heart", 78000, 0);
+  splits_.emplace_back("Palace 5", 616000, 5);
+  splits_.emplace_back("Swamp 1 Up", 149000, 0);
+  splits_.emplace_back("Spell", 162000, 0);
+  splits_.emplace_back("Desert Heart", 93000, 0);
+  splits_.emplace_back("Palace 6", 402000, 6);
+  splits_.emplace_back("Thunder", 61000, 0);
+  splits_.emplace_back("Palace 7", 747000, 0);
 
   return true;
 }
@@ -97,11 +97,20 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
     if (i >= offset && i < offset + max_shown) {
       text_->draw(graphics, s.name, 16, y);
-      if (i <= index_) draw_time(graphics, total, right, y);
+      if (i <= index_) {
+        draw_time(graphics, s.current, right, y);
+
+        if (s.best > 0) {
+          const int compare = s.current - s.best;
+          draw_time(graphics, compare, right - 80, y);
+        }
+      }
     }
   }
 
   maps_->draw(graphics, splits_[index_].hint, 8, graphics.height() - 72);
+
+  draw_time(graphics, total, right, graphics.height() - 96);
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
@@ -124,8 +133,8 @@ void SplitsScreen::draw(Graphics& graphics) const {
   // TODO draw hint
 }
 
-SplitsScreen::Split::Split(const std::string& name, int hint=-1) :
-  name(name), current(0), hint(hint) {}
+SplitsScreen::Split::Split(const std::string& name, unsigned int best, int hint) :
+  name(name), current(0), best(best), hint(hint) {}
 
 void SplitsScreen::stop() {
   running_ = false;
