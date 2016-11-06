@@ -1,0 +1,66 @@
+syntax = "proto3";
+package z2splits;
+
+import "proto/controller.proto";
+
+enum WindowGravity {
+    GravityUnknown = 0;
+    UpperLeft = 1;
+    UpperRight = 2;
+    LowerLeft = 3;
+    LowerRight = 4;
+}
+
+enum ImageType {
+    ImageTypeUnknown = 0;
+    Image = 1;
+    SpriteSheet = 2;
+    Text = 3;
+}
+
+message SpriteSheetInfo {
+    int32 columns = 1;
+    int32 width = 2;
+    int32 height = 3;
+}
+
+message ImageResource {
+    ImageType type = 1;
+    string id = 2;
+    string filename = 3;
+    SpriteSheetInfo sprite = 4;
+}
+
+message DisplayImage {
+    WindowGravity origin = 1;
+    string id = 2;
+    int32 x = 3;
+    int32 y = 4;
+}
+
+message Split {
+    string name = 1;
+    DisplayImage image = 2;
+    int32 time_ms = 3;
+}
+
+message CategoryConfig {
+    string name = 1;
+    repeated Split splits = 2;
+}
+
+message GameConfig {
+    string name = 1;
+    repeated CategoryConfig category = 2;
+}
+
+message Config {
+    // Users never set path, the loader uses it
+    string path = 1;
+    repeated string load = 2;
+    repeated ControlKeys controls = 3;
+    repeated GameConfig game = 4;
+}
+
+
+// vim: ts=4 sts=4 sw=4 expandtab:

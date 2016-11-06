@@ -1,0 +1,6 @@
+controls: [
+    { scancode: SDL_SCANCODE_SPACE action: SPLIT },
+    { scancode: SDL_SCANCODE_BACKSPACE action: BACK },
+    { scancode: SDL_SCANCODE_RETURN action: STOP },
+    { scancode: SDL_SCANCODE_ESCAPE action: RESET }
+]

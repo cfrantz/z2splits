@@ -16,50 +16,29 @@ void SplitsScreen::init() {
   maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
 }
 
-bool SplitsScreen::load_splits(const std::string& file) {
-  file_ = file;
+bool SplitsScreen::load_splits(const z2splits::Config& config) {
+  config_ = config;
 
-  title_ = "Zelda 2 All Keys";
+  game_ = 0;
+  category_ = 0;
 
-  splits_.emplace_back("Magic", 0);
-  splits_.emplace_back("Shield", 0);
-  splits_.emplace_back("Desert Heart", 0);
-  splits_.emplace_back("Palace 1", 1);
-  splits_.emplace_back("Trophy", 0);
-  splits_.emplace_back("Jump", 0);
-  splits_.emplace_back("Swamp 1 Up", 0);
-  splits_.emplace_back("Bagu", 0);
-  splits_.emplace_back("Life", 0);
-  splits_.emplace_back("Hammer", 0);
-  splits_.emplace_back("Rock Magic", 0);
-  splits_.emplace_back("Desert 1 Up", 0);
-  splits_.emplace_back("Cave Heart", 0);
-  splits_.emplace_back("Medicine", 0);
-  splits_.emplace_back("Fairy", 0);
-  splits_.emplace_back("Palace 2", 2);
-  splits_.emplace_back("Palace 3", 3);
-  splits_.emplace_back("Fire", 0);
-  splits_.emplace_back("Desert 1 Up", 0);
-  splits_.emplace_back("Pit Magic", 0);
-  splits_.emplace_back("Boots", 4);
-  splits_.emplace_back("Child", 0);
-  splits_.emplace_back("Reflect", 0);
-  splits_.emplace_back("Palace 4", 4);
-  splits_.emplace_back("Ocean Heart", 0);
-  splits_.emplace_back("Palace 5", 5);
-  splits_.emplace_back("Swamp 1 Up", 0);
-  splits_.emplace_back("Spell", 0);
-  splits_.emplace_back("Desert Heart", 0);
-  splits_.emplace_back("Palace 6", 6);
-  splits_.emplace_back("Thunder", 0);
-  splits_.emplace_back("Palace 7", 0);
+  const z2splits::GameConfig& gcfg = config_.game(game_);
+  const z2splits::CategoryConfig& ccfg = gcfg.category(category_);
+
+  title_ = gcfg.name() + ": " + ccfg.name();
+
+  // Intentionally making a copy to clear the "image" field.
+  for(z2splits::Split split : ccfg.splits()) {
+      split.mutable_image()->Clear();
+      splits_.push_back(split);
+  }
 
   return true;
 }
 
 bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   if (running_) {
-    splits_[index_].current += elapsed;
+    splits_[index_].set_time_ms(splits_[index_].time_ms() + elapsed);
     time_ += elapsed;
 
     if (input.key_pressed(SDL_SCANCODE_SPACE)) next();
@@ -90,18 +69,18 @@ void SplitsScreen::draw(Graphics& graphics) const {
   }
 
   for (size_t i = 0; i < splits_.size(); ++i) {
-    const Split s = splits_[i];
+    const z2splits::Split s = splits_[i];
     const int y = 16 * (i - offset) + 40;
 
-    total += s.current;
+    total += s.time_ms();
 
     if (i >= offset && i < offset + max_shown) {
-      text_->draw(graphics, s.name, 16, y);
+      text_->draw(graphics, s.name(), 16, y);
       if (i <= index_) draw_time(graphics, total, right, y);
     }
   }
 
-  maps_->draw(graphics, splits_[index_].hint, 0, graphics.height() - 72);
+//  maps_->draw(graphics, splits_[index_].hint, 0, graphics.height() - 72);
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
@@ -124,9 +103,6 @@ void SplitsScreen::draw(Graphics& graphics) const {
   // TODO draw hint
 }
 
-SplitsScreen::Split::Split(const std::string& name, int hint=-1) :
-  name(name), current(0), hint(hint) {}
-
 void SplitsScreen::stop() {
   running_ = false;
 }
@@ -134,7 +110,9 @@ void SplitsScreen::stop() {
 void SplitsScreen::reset() {
   running_ = false;
   index_ = time_ = 0;
-  for (size_t i = 0; i < splits_.size(); ++i) splits_[i].current = 0;
+  for (size_t i = 0; i < splits_.size(); ++i) {
+      splits_[i].set_time_ms(0);
+  }
 }
 
 void SplitsScreen::go() {
@@ -149,8 +127,9 @@ void SplitsScreen::next() {
 
 void SplitsScreen::back() {
   if (index_ > 0) {
-    splits_[index_ - 1].current += splits_[index_].current;
-    splits_[index_].current = 0;
+    splits_[index_ - 1].set_time_ms(splits_[index_ - 1].time_ms() +
+                                    splits_[index_].time_ms());
+    splits_[index_].set_time_ms(0);
     --index_;
   } else {
     stop();

@@ -1,0 +1,23 @@
+game {
+    name: "Zelda II"
+    category {
+        name: "All Keys"
+        splits: [
+            { name: "Magic" },
+            { name: "Palace 1" },
+            { name: "Saria" },
+            { name: "Hammer" },
+            { name: "Medicine" },
+            { name: "Mido" },
+            { name: "Palace 2" },
+            { name: "Palace 3" },
+            { name: "Child" },
+            { name: "Darunia" },
+            { name: "Palace 4" },
+            { name: "Palace 5" },
+            { name: "New Kasuto" },
+            { name: "Palace 6" },
+            { name: "Palace 7" }
+        ]
+    }
+}
