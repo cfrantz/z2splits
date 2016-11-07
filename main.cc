@@ -13,7 +13,7 @@ int main(int, char**) {
   SplitsScreen *s = new SplitsScreen();
 
   // TODO load splits from command line
-  s->load_splits("tlozhacks.txt");
+  s->load("content/z2allkeys.txt");
 
   Game game(config);
   game.loop(s);

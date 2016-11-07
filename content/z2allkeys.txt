@@ -1,0 +1,33 @@
+Zelda 2 All Keys
+0 0 Magic
+0 0 Trophy
+0 0 Shield
+0 0 Grass Heart
+1 0 Palace 1
+0 0 Jump
+0 0 Swamp 1 Up
+0 0 Bagu
+0 0 Life
+0 0 Hammer
+0 0 Rock Magic
+0 0 Desert 1 Up
+0 0 Medicine
+0 0 Fairy
+0 0 Cave Heart
+2 0 Palace 2
+3 0 Palace 3
+0 0 Fire
+0 0 Desert 1 Up
+0 0 Pit Magic
+4 0 Boots
+0 0 Child
+0 0 Reflect
+4 0 Palace 4
+0 0 Water Heart
+5 0 Palace 5
+0 0 Swamp 1 Up
+0 0 Spell
+0 0 Desert Heart
+6 0 Palace 6
+0 0 Thunder
+0 0 Palace 7

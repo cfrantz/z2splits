@@ -15,7 +15,8 @@ class SplitsScreen : public Screen {
   public:
 
     void init();
-    bool load_splits(const std::string& file);
+    bool load(const std::string& file);
+    void save();
     bool update(const Input& input, Audio& audio, unsigned int elapsed);
 
     void draw(Graphics& graphics) const;
@@ -23,7 +24,7 @@ class SplitsScreen : public Screen {
   private:
 
     struct Split {
-      Split(const std::string& name, unsigned int best, int hint);
+      Split(const std::string& name, int hint, unsigned int best);
       std::string name;
       unsigned int current, best;
       int hint;

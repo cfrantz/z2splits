@@ -1,6 +1,7 @@
 #include "splits_screen.h"
 
 #include <cstdlib>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -16,45 +17,40 @@ void SplitsScreen::init() {
   maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
 }
 
-bool SplitsScreen::load_splits(const std::string& file) {
+bool SplitsScreen::load(const std::string& file) {
   file_ = file;
+  splits_.clear();
 
-  title_ = "Zelda 2 All Keys";
+  std::ifstream in(file);
+  std::getline(in, title_);
 
-  splits_.emplace_back("Magic", 0, 0);
-  splits_.emplace_back("Trophy", 0, 0);
-  splits_.emplace_back("Shield", 0, 0);
-  splits_.emplace_back("Desert Heart", 0, 0);
-  splits_.emplace_back("Palace 1", 0, 1);
-  splits_.emplace_back("Jump", 0, 0);
-  splits_.emplace_back("Swamp 1 Up", 0, 0);
-  splits_.emplace_back("Bagu", 0, 0);
-  splits_.emplace_back("Life", 0, 0);
-  splits_.emplace_back("Hammer", 0, 0);
-  splits_.emplace_back("Rock Magic", 0, 0);
-  splits_.emplace_back("Desert 1 Up", 0, 0);
-  splits_.emplace_back("Cave Heart", 0, 0);
-  splits_.emplace_back("Medicine", 0, 0);
-  splits_.emplace_back("Fairy", 0, 0);
-  splits_.emplace_back("Palace 2", 0, 2);
-  splits_.emplace_back("Palace 3", 0, 3);
-  splits_.emplace_back("Fire", 0, 0);
-  splits_.emplace_back("Desert 1 Up", 67000, 0);
-  splits_.emplace_back("Pit Magic", 38000, 0);
-  splits_.emplace_back("Boots", 225000, 4);
-  splits_.emplace_back("Child", 199000, 0);
-  splits_.emplace_back("Reflect", 152000, 0);
-  splits_.emplace_back("Palace 4", 335000, 4);
-  splits_.emplace_back("Ocean Heart", 78000, 0);
-  splits_.emplace_back("Palace 5", 616000, 5);
-  splits_.emplace_back("Swamp 1 Up", 149000, 0);
-  splits_.emplace_back("Spell", 162000, 0);
-  splits_.emplace_back("Desert Heart", 93000, 0);
-  splits_.emplace_back("Palace 6", 402000, 6);
-  splits_.emplace_back("Thunder", 61000, 0);
-  splits_.emplace_back("Palace 7", 747000, 0);
+  std::string name;
+  unsigned int hint, best;
+
+  while (true) {
+    in >> hint >> best;
+    std::getline(in, name);
+    splits_.emplace_back(name, hint, best);
+
+    if (in.eof()) break;
+  }
 
   return true;
+}
+
+void SplitsScreen::save() {
+  std::ofstream out(file_);
+
+  if (out.is_open()) {
+    out << title_ << "\n";
+    for (size_t i = 0; i < splits_.size(); ++i) {
+      Split s = splits_[i];
+      if (s.current < s.best) s.best = s.current;
+      out << s.hint << " " << s.best << " " << s.name << "\n";
+    }
+
+    out.close();
+  }
 }
 
 bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
@@ -129,11 +125,9 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   draw_vline(graphics, 2, 32, graphics.height() - 41);
   draw_vline(graphics, graphics.width() - 6, 32, graphics.height() - 41);
-
-  // TODO draw hint
 }
 
-SplitsScreen::Split::Split(const std::string& name, unsigned int best, int hint) :
+SplitsScreen::Split::Split(const std::string& name, int hint, unsigned int best) :
   name(name), current(0), best(best), hint(hint) {}
 
 void SplitsScreen::stop() {
@@ -153,7 +147,10 @@ void SplitsScreen::go() {
 void SplitsScreen::next() {
   ++index_;
 
-  if (index_ >= splits_.size()) stop();
+  if (index_ >= splits_.size()) {
+    save();
+    stop();
+  }
 }
 
 void SplitsScreen::back() {
