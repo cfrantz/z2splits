@@ -65,6 +65,7 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     if (input.key_pressed(SDL_SCANCODE_SPACE)) next();
     if (input.key_pressed(SDL_SCANCODE_BACKSPACE)) back();
     if (input.key_pressed(SDL_SCANCODE_RETURN)) stop();
+    if (input.key_pressed(SDL_SCANCODE_TAB)) skip();
 
   } else {
     if (input.key_pressed(SDL_SCANCODE_SPACE)) go();
@@ -98,7 +99,11 @@ void SplitsScreen::draw(Graphics& graphics) const {
     if (i >= offset && i < offset + max_shown) {
       text_->draw(graphics, s.name, 16, y);
       if (i <= index_) {
-        draw_time(graphics, s.current, right, y);
+        if (s.current > 0) {
+          draw_time(graphics, s.current, right, y);
+        } else {
+          text_->draw(graphics, "-", right, y, Text::Alignment::RIGHT);
+        }
 
         if (s.best > 0) {
           const int compare = s.current - s.best;
@@ -156,6 +161,13 @@ void SplitsScreen::next() {
     save();
     stop();
   }
+}
+
+void SplitsScreen::skip() {
+  next();
+
+  splits_[index_].current += splits_[index_ - 1].current;
+  splits_[index_ - 1].current = 0;
 }
 
 void SplitsScreen::back() {

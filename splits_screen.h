@@ -41,6 +41,7 @@ class SplitsScreen : public Screen {
     void reset();
     void go();
     void next();
+    void skip();
     void back();
 
     void draw_time(Graphics& graphics, int ms, int x, int y) const;
