@@ -32,7 +32,7 @@ class SplitsScreen : public Screen {
 
     std::string title_, file_;
     std::vector<Split> splits_;
-    unsigned int index_, time_;
+    unsigned int index_, time_, delay_;
     bool running_;
     std::unique_ptr<Text> text_;
     std::unique_ptr<SpriteMap> maps_;

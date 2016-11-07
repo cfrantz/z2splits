@@ -22,6 +22,8 @@ bool SplitsScreen::load(const std::string& file) {
   splits_.clear();
 
   std::ifstream in(file);
+
+  in >> delay_;
   std::getline(in, title_);
 
   std::string name;
@@ -34,6 +36,8 @@ bool SplitsScreen::load(const std::string& file) {
 
     if (in.eof()) break;
   }
+
+  reset();
 
   return true;
 }
@@ -138,6 +142,7 @@ void SplitsScreen::reset() {
   running_ = false;
   index_ = time_ = 0;
   for (size_t i = 0; i < splits_.size(); ++i) splits_[i].current = 0;
+  splits_[0].current = -delay_;
 }
 
 void SplitsScreen::go() {
