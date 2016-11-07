@@ -6,9 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-static const SDL_Scancode KEY_NEXT = SDL_SCANCODE_SPACE;
-static const SDL_Scancode KEY_ERASE = SDL_SCANCODE_ESCAPE;
-
 void SplitsScreen::init() {
   index_ = time_ = 0;
   running_ = false;
@@ -82,7 +79,6 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   const int right = graphics.width() - 16;
 
-  unsigned int total = 0;
   int offset = 0;
   const int max_shown = (graphics.height() - 144) / 16;
 
@@ -94,8 +90,6 @@ void SplitsScreen::draw(Graphics& graphics) const {
   for (size_t i = 0; i < splits_.size(); ++i) {
     const Split s = splits_[i];
     const int y = 16 * (i - offset) + 40;
-
-    total += s.current;
 
     if (i >= offset && i < offset + max_shown) {
       text_->draw(graphics, s.name, 16, y);
@@ -116,7 +110,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   maps_->draw(graphics, splits_[index_].hint, 8, graphics.height() - 72);
 
-  draw_time(graphics, total, right, graphics.height() - 96);
+  draw_time(graphics, time_, right, graphics.height() - 96);
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
