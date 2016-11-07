@@ -69,8 +69,9 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   } else {
     if (input.key_pressed(SDL_SCANCODE_SPACE)) go();
-    if (input.key_pressed(SDL_SCANCODE_ESCAPE)) reset();
   }
+
+  if (input.key_pressed(SDL_SCANCODE_ESCAPE)) reset();
 
   return true;
 }
