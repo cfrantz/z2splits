@@ -27,11 +27,12 @@ bool SplitsScreen::load(const std::string& file) {
   unsigned int hint, best;
 
   while (true) {
-    in >> hint >> best;
-    std::getline(in, name);
-    splits_.emplace_back(name, hint, best);
-
-    if (in.eof()) break;
+    if (in >> hint >> best) {
+      std::getline(in, name);
+      splits_.emplace_back(name, hint, best);
+    } else {
+      break;
+    }
   }
 
   reset();
@@ -43,10 +44,10 @@ void SplitsScreen::save() {
   std::ofstream out(file_);
 
   if (out.is_open()) {
-    out << title_ << "\n";
+    out << delay_ << title_ << "\n";
     for (size_t i = 0; i < splits_.size(); ++i) {
       Split s = splits_[i];
-      if (s.current < s.best) s.best = s.current;
+      if (s.current < s.best || s.best == 0) s.best = s.current;
       out << s.hint << " " << s.best << " " << s.name << "\n";
     }
 
