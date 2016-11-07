@@ -25,10 +25,12 @@ message SpriteSheetInfo {
 }
 
 message ImageResource {
-    ImageType type = 1;
-    string id = 2;
-    string filename = 3;
-    SpriteSheetInfo sprite = 4;
+    // ConfigLoader sets path.
+    string path = 1;
+    ImageType type = 2;
+    string id = 3;
+    string filename = 4;
+    SpriteSheetInfo sprite = 5;
 }
 
 message DisplayImage {
@@ -51,7 +53,8 @@ message CategoryConfig {
 
 message GameConfig {
     string name = 1;
-    repeated CategoryConfig category = 2;
+    repeated ImageResource resource = 2;
+    repeated CategoryConfig category = 3;
 }
 
 message Config {

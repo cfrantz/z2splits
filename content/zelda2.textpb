@@ -1,23 +1,78 @@
 game {
     name: "Zelda II"
+    resource {
+        type: SpriteSheet
+        id: "map"
+        filename: "maps.png"
+        sprite {
+            columns: 1
+            width: 256
+            height: 64
+        }
+    }
     category {
         name: "All Keys"
         splits: [
-            { name: "Magic" },
-            { name: "Palace 1" },
-            { name: "Saria" },
-            { name: "Hammer" },
-            { name: "Medicine" },
-            { name: "Mido" },
-            { name: "Palace 2" },
-            { name: "Palace 3" },
-            { name: "Child" },
-            { name: "Darunia" },
-            { name: "Palace 4" },
-            { name: "Palace 5" },
-            { name: "New Kasuto" },
-            { name: "Palace 6" },
-            { name: "Palace 7" }
+            {
+                name: "Magic"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 1"
+                image { origin: LowerLeft id: "map:1" x: 0 y: -72 }
+            },
+            {
+                name: "Saria"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Hammer"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Medicine"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Mido"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 2"
+                image { origin: LowerLeft id: "map:2" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 3"
+                image { origin: LowerLeft id: "map:3" x: 0 y: -72 }
+            },
+            {
+                name: "Child"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Darunia"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 4"
+                image { origin: LowerLeft id: "map:4" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 5"
+                image { origin: LowerLeft id: "map:5" x: 0 y: -72 }
+            },
+            {
+                name: "New Kasuto"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 6"
+                image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
+            },
+            {
+                name: "Palace 7"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+            }
         ]
     }
 }

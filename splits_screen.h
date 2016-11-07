@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,6 @@ class SplitsScreen : public Screen {
     void draw(Graphics& graphics) const;
 
   private:
-
     std::string title_, file_;
     int game_;
     int category_;
@@ -31,6 +31,7 @@ class SplitsScreen : public Screen {
     bool running_;
     std::unique_ptr<Text> text_;
     std::unique_ptr<SpriteMap> maps_;
+    std::map<std::string, std::unique_ptr<SpriteMap>> images_;
 
     void stop();
     void reset();
@@ -38,6 +39,7 @@ class SplitsScreen : public Screen {
     void next();
     void back();
 
+    void load_resources(const z2splits::GameConfig& gcfg);
     void draw_time(Graphics& graphics, int ms, int x, int y) const;
 
     void draw_corner(Graphics& graphics, int x, int y) const;

@@ -5,6 +5,10 @@
 #include <iostream>
 #include <sstream>
 
+#include "util/logging.h"
+#include "util/os.h"
+#include "util/strutil.h"
+
 static const SDL_Scancode KEY_NEXT = SDL_SCANCODE_SPACE;
 static const SDL_Scancode KEY_ERASE = SDL_SCANCODE_ESCAPE;
 
@@ -16,6 +20,22 @@ void SplitsScreen::init() {
   maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
 }
 
+void SplitsScreen::load_resources(const z2splits::GameConfig& gcfg) {
+  for(const auto& ir : gcfg.resource()) {
+    if (ir.type() == z2splits::ImageType::SpriteSheet) {
+        const auto& ss = ir.sprite();
+
+        //std::string filename = os::path::Join({ir.path(), ir.filename()});
+        const std::string& filename = ir.filename();
+        LOG(INFO, "resource: ", filename);
+        images_[ir.id()].reset(new SpriteMap(filename, ss.columns(),
+                                             ss.width(), ss.height()));
+    } else {
+      LOG(ERROR, "ImageResource.type ", ir.type(), " not suppoted.");
+    }
+  }
+}
+
 bool SplitsScreen::load_splits(const z2splits::Config& config) {
   config_ = config;
 
@@ -25,11 +45,11 @@ bool SplitsScreen::load_splits(const z2splits::Config& config) {
   const z2splits::GameConfig& gcfg = config_.game(game_);
   const z2splits::CategoryConfig& ccfg = gcfg.category(category_);
 
+
   title_ = gcfg.name() + ": " + ccfg.name();
 
-  // Intentionally making a copy to clear the "image" field.
-  for(z2splits::Split split : ccfg.splits()) {
-      split.mutable_image()->Clear();
+  load_resources(gcfg);
+  for(const z2splits::Split& split : ccfg.splits()) {
       splits_.push_back(split);
   }
 
@@ -85,7 +105,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
   }
 
   for (size_t i = 0; i < splits_.size(); ++i) {
-    const z2splits::Split s = splits_[i];
+    const z2splits::Split& s = splits_[i];
     const int y = 16 * (i - offset) + 40;
 
     total += s.time_ms();
@@ -96,7 +116,34 @@ void SplitsScreen::draw(Graphics& graphics) const {
     }
   }
 
-//  maps_->draw(graphics, splits_[index_].hint, 0, graphics.height() - 72);
+  if (index_ < splits_.size()) {
+    const z2splits::Split& s = splits_[index_];
+    int n = -1;
+    int x, y;
+
+    std::vector<std::string> hint = google::protobuf::Split(s.image().id(), ":");
+    switch(s.image().origin()) {
+        case z2splits::WindowGravity::UpperLeft:
+          x = 0; y = 0; break;
+        case z2splits::WindowGravity::UpperRight:
+          x = graphics.width(); y = 0; break;
+        case z2splits::WindowGravity::LowerRight:
+          x = graphics.width(); y = graphics.height(); break;
+        case z2splits::WindowGravity::LowerLeft:
+        default:
+          x = 0;                y = graphics.height(); break;
+    }
+    x += s.image().x();
+    y += s.image().y();
+
+    if (hint.size() == 2) {
+      safe_strto32(hint[1], &n);
+      const auto& im = images_.find(hint[0]);
+      if (im != images_.end()) {
+          im->second->draw(graphics, n, x, y);
+      }
+    }
+  }
 
   draw_corner(graphics, 1, 1);
   draw_corner(graphics, graphics.width() - 7, 1);
