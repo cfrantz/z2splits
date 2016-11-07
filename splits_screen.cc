@@ -7,11 +7,10 @@
 #include <sstream>
 
 void SplitsScreen::init() {
-  index_ = time_ = 0;
-  running_ = false;
-
   text_.reset(new Text("text.png"));
   maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
+
+  reset();
 }
 
 bool SplitsScreen::load(const std::string& file) {
@@ -141,9 +140,9 @@ void SplitsScreen::stop() {
 
 void SplitsScreen::reset() {
   running_ = false;
-  index_ = time_ = 0;
+  index_ = 0;
   for (size_t i = 0; i < splits_.size(); ++i) splits_[i].current = 0;
-  splits_[0].current = -delay_;
+  time_ = splits_[0].current = -delay_;
 }
 
 void SplitsScreen::go() {
