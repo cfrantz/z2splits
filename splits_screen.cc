@@ -4,11 +4,18 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <gflags/gflags.h>
 
+#include "google/protobuf/text_format.h"
+#include "util/file.h"
 #include "util/logging.h"
 #include "util/os.h"
 #include "util/strutil.h"
 
+// Change this when we're happy with loading/saving.
+DEFINE_bool(text_format, true, "Save splits as textpb");
+
+using google::protobuf::TextFormat;
 static const SDL_Scancode KEY_NEXT = SDL_SCANCODE_SPACE;
 static const SDL_Scancode KEY_ERASE = SDL_SCANCODE_ESCAPE;
 
@@ -45,21 +52,87 @@ bool SplitsScreen::load_splits(const z2splits::Config& config) {
   const z2splits::GameConfig& gcfg = config_.game(game_);
   const z2splits::CategoryConfig& ccfg = gcfg.category(category_);
 
-
   title_ = gcfg.name() + ": " + ccfg.name();
 
   load_resources(gcfg);
-  for(const z2splits::Split& split : ccfg.splits()) {
-      splits_.push_back(split);
+  *run_.mutable_splits() = ccfg.splits();
+
+  std::string saved_data;
+  saved_runs_.Clear();
+  if (ccfg.save_filename().empty()) {
+      std::string fn;
+      for(auto ch : title_) {
+          fn.append(1, isalnum(ch) ? ch : '_');
+      }
+      config_.mutable_game(game_)->
+          mutable_category(category_)->set_save_filename(fn);
+  }
+
+
+  if (File::GetContents(ccfg.save_filename(), &saved_data)) {
+    if (saved_runs_.ParseFromString(saved_data)) {
+        number_ = saved_runs_.run(saved_runs_.run_size() - 1).number();
+    } else {
+      LOG(INFO, "Couldn't parse binary protobuf.  Trying TextFormat");
+      if (TextFormat::ParseFromString(saved_data, &saved_runs_)) {
+        number_ = saved_runs_.run(saved_runs_.run_size() - 1).number();
+      } else {
+        LOG(WARN, "Couldn't parse text protobuf either.");
+      }
+    }
+  } else {
+    LOG(WARN, "Couldn't load saved splits from '", ccfg.save_filename(), "'");
   }
 
   return true;
 }
 
+void SplitsScreen::save_splits() {
+
+  *saved_runs_.add_run() = run_;
+
+  int n = run_.splits_size();
+  int total = run_.splits(n-1).time_ms();
+
+  auto* best = saved_runs_.mutable_best();
+  int bestn = best->splits_size();
+  if (bestn == 0) {
+      *best = run_;
+  } else if (total < best->splits(bestn - 1).time_ms()) {
+      *best = run_;
+  }
+
+  if (saved_runs_.gold().splits_size() == 0) {
+    *saved_runs_.mutable_gold() = run_;
+  } else {
+    for(auto& gold : *saved_runs_.mutable_gold()->mutable_splits()) {
+      for(const auto& split : run_.splits()) {
+        if (gold.name() == split.name()) {
+          if (split.time_ms() < gold.time_ms()) {
+            gold = split;
+          }
+        }
+      }
+    }
+  }
+
+  const auto& fn = config_.game(game_).category(category_).save_filename();
+  std::string data;
+  if (FLAGS_text_format) {
+    TextFormat::PrintToString(saved_runs_, &data);
+  } else {
+    saved_runs_.SerializeToString(&data);
+  }
+  if (!File::SetContents(fn, data)) {
+    LOG(ERROR, "Couldn't load save splits to '", fn, "'");
+  }
+}
+
 bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   z2splits::ControlAction action;
   if (running_) {
-    splits_[index_].set_time_ms(splits_[index_].time_ms() + elapsed);
+    auto* split = run_.mutable_splits(index_);
+    split->set_time_ms(split->time_ms() + elapsed);
     time_ += elapsed;
 
     for(const auto& c : config_.controls()) {
@@ -95,17 +168,17 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   const int right = graphics.width() - 16;
 
-  unsigned int total = 0;
+  int total = 0;
   int offset = 0;
   const int max_shown = 16;
 
-  if (splits_.size() > max_shown) {
+  if (run_.splits_size() > max_shown) {
     offset = index_ - max_shown + 1;
     if (offset < 0) offset = 0;
   }
 
-  for (size_t i = 0; i < splits_.size(); ++i) {
-    const z2splits::Split& s = splits_[i];
+  for (int i = 0; i < run_.splits_size(); ++i) {
+    const z2splits::Split& s = run_.splits(i);
     const int y = 16 * (i - offset) + 40;
 
     total += s.time_ms();
@@ -116,8 +189,8 @@ void SplitsScreen::draw(Graphics& graphics) const {
     }
   }
 
-  if (index_ < splits_.size()) {
-    const z2splits::Split& s = splits_[index_];
+  if (index_ < run_.splits_size()) {
+    const z2splits::Split& s = run_.splits(index_);
     int n = -1;
     int x, y;
 
@@ -168,31 +241,35 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
 void SplitsScreen::stop() {
   running_ = false;
+  save_splits();
 }
 
 void SplitsScreen::reset() {
   running_ = false;
   index_ = time_ = 0;
-  for (size_t i = 0; i < splits_.size(); ++i) {
-      splits_[i].set_time_ms(0);
+  number_++;
+  for (int i = 0; i < run_.splits_size(); ++i) {
+      run_.mutable_splits(i)->set_time_ms(0);
   }
 }
 
 void SplitsScreen::go() {
-  if (index_ < splits_.size()) running_ = true;
+  if (index_ < run_.splits_size()) running_ = true;
 }
 
 void SplitsScreen::next() {
   ++index_;
 
-  if (index_ >= splits_.size()) stop();
+  if (index_ >= run_.splits_size()) stop();
 }
 
 void SplitsScreen::back() {
   if (index_ > 0) {
-    splits_[index_ - 1].set_time_ms(splits_[index_ - 1].time_ms() +
-                                    splits_[index_].time_ms());
-    splits_[index_].set_time_ms(0);
+    auto* split = run_.mutable_splits(index_);
+    auto* last = run_.mutable_splits(index_ - 1);
+
+    last->set_time_ms(last->time_ms() + split->time_ms());
+    split->set_time_ms(0);
     --index_;
   } else {
     stop();

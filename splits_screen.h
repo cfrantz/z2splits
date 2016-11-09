@@ -18,6 +18,7 @@ class SplitsScreen : public Screen {
 
     void init();
     bool load_splits(const z2splits::Config& config);
+    void save_splits();
     bool update(const Input& input, Audio& audio, unsigned int elapsed);
 
     void draw(Graphics& graphics) const;
@@ -26,8 +27,10 @@ class SplitsScreen : public Screen {
     std::string title_, file_;
     int game_;
     int category_;
-    std::vector<z2splits::Split> splits_;
-    unsigned int index_, time_;
+    z2splits::Run run_;
+    z2splits::SavedRuns saved_runs_;
+    int index_, time_;
+    int number_;
     bool running_;
     std::unique_ptr<Text> text_;
     std::unique_ptr<SpriteMap> maps_;

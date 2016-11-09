@@ -48,13 +48,27 @@ message Split {
 
 message CategoryConfig {
     string name = 1;
-    repeated Split splits = 2;
+    string save_filename = 2;
+    repeated Split splits = 3;
 }
 
 message GameConfig {
     string name = 1;
     repeated ImageResource resource = 2;
     repeated CategoryConfig category = 3;
+}
+
+message Run {
+    int32 number = 1;
+    repeated Split splits = 2;
+}
+
+message SavedRuns {
+    string game = 1;
+    string category = 2;
+    Run best = 3;
+    Run gold = 4;
+    repeated Run run = 5;
 }
 
 message Config {

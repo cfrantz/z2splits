@@ -23,6 +23,7 @@ cc_library(
     hdrs = ["splits_screen.h"],
     deps = [
         "//proto:config",
+        "//util:file",
         "//util:logging",
         "//util:os",
         "//util:string",
