@@ -9,6 +9,8 @@
 void SplitsScreen::init() {
   text_.reset(new Text("text.png"));
   maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
+  fairy_.reset(new SpriteMap("fairy.png", 2, 8, 16));
+  triforce_.reset(new SpriteMap("triforce.png", 3, 8, 16));
 
   reset();
 }
@@ -56,8 +58,8 @@ void SplitsScreen::save() {
 
 bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   if (running_) {
-    splits_[index_].current += elapsed;
     time_ += elapsed;
+    splits_[index_].current = time_;
 
     if (input.key_pressed(SDL_SCANCODE_SPACE)) next();
     if (input.key_pressed(SDL_SCANCODE_BACKSPACE)) back();
@@ -92,17 +94,26 @@ void SplitsScreen::draw(Graphics& graphics) const {
     const int y = 16 * (i - offset) + 40;
 
     if (i >= offset && i < offset + max_shown) {
-      text_->draw(graphics, s.name, 16, y);
-      if (i <= index_) {
+      if (i == index_) fairy_->draw(graphics, (time_ / 64) % 2, 16, y);
+
+      text_->draw(graphics, s.name, 24, y);
+
+      if (s.best > 0) {
+        draw_time(graphics, s.best, right, y);
+
+        if (i <= index_) {
+          draw_time(graphics, s.current - s.best, right - 80, y);
+          // TODO fix gold checking
+          if (i < index_ && s.current < s.best) {
+            triforce_->draw(graphics, (time_ / 64) % 3, right - 80, y);
+          }
+        }
+
+      } else if (i <= index_) {
         if (s.current > 0) {
           draw_time(graphics, s.current, right, y);
         } else {
-          text_->draw(graphics, "-", right, y, Text::Alignment::RIGHT);
-        }
-
-        if (s.best > 0) {
-          const int compare = s.current - s.best;
-          draw_time(graphics, compare, right - 80, y);
+          text_->draw(graphics, "-", right, y);
         }
       }
     }
@@ -159,15 +170,14 @@ void SplitsScreen::next() {
 }
 
 void SplitsScreen::skip() {
-  next();
-
-  splits_[index_].current += splits_[index_ - 1].current;
-  splits_[index_ - 1].current = 0;
+  if (index_ < splits_.size()) {
+    splits_[index_].current = 0;
+    ++index_;
+  }
 }
 
 void SplitsScreen::back() {
   if (index_ > 0) {
-    splits_[index_ - 1].current += splits_[index_].current;
     splits_[index_].current = 0;
     --index_;
   } else {

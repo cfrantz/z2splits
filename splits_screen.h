@@ -35,7 +35,7 @@ class SplitsScreen : public Screen {
     unsigned int index_, time_, delay_;
     bool running_;
     std::unique_ptr<Text> text_;
-    std::unique_ptr<SpriteMap> maps_;
+    std::unique_ptr<SpriteMap> maps_, fairy_, triforce_;
 
     void stop();
     void reset();
