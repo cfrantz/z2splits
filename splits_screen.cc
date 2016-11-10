@@ -12,6 +12,8 @@ void SplitsScreen::init() {
   fairy_.reset(new SpriteMap("fairy.png", 2, 8, 16));
   triforce_.reset(new SpriteMap("triforce.png", 3, 8, 16));
 
+  visible_ = 15;
+
   reset();
 }
 
@@ -72,49 +74,40 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
 
   if (input.key_pressed(SDL_SCANCODE_ESCAPE)) reset();
 
+  if (input.key_pressed(SDL_SCANCODE_UP)) scroll_up();
+  if (input.key_pressed(SDL_SCANCODE_DOWN)) scroll_down();
+
   return true;
 }
 
 void SplitsScreen::draw(Graphics& graphics) const {
-  text_->draw(
-      graphics, title_, graphics.width() / 2, 8, Text::Alignment::CENTER);
+  text_->draw(graphics, title_, graphics.width() / 2, 8, Text::Alignment::CENTER);
 
   const int right = graphics.width() - 16;
 
-  int offset = 0;
-  const int max_shown = (graphics.height() - 144) / 16;
+  for (size_t i = 0; i < visible_; ++i) {
+    if (i + offset_ >= splits_.size()) break;
 
-  if (splits_.size() > max_shown) {
-    offset = index_ - max_shown + 1;
-    if (offset < 0) offset = 0;
-  }
+    const Split s = splits_[i + offset_];
+    const int y = 16 * i + 40;
 
-  for (size_t i = 0; i < splits_.size(); ++i) {
-    const Split s = splits_[i];
-    const int y = 16 * (i - offset) + 40;
+    if (i + offset_ == index_) fairy_->draw(graphics, (time_ / 64) % 2, 16, y);
 
-    if (i >= offset && i < offset + max_shown) {
-      if (i == index_) fairy_->draw(graphics, (time_ / 64) % 2, 16, y);
+    text_->draw(graphics, s.name, 24, y);
 
-      text_->draw(graphics, s.name, 24, y);
+    if (s.best > 0) {
+      draw_time(graphics, s.best, right, y);
 
-      if (s.best > 0) {
-        draw_time(graphics, s.best, right, y);
+      if (i + offset_ <= index_) {
+        draw_time(graphics, s.current - s.best, right - 80, y);
+        if (is_gold_split(i + offset_)) triforce_->draw(graphics, (time_ / 64) % 3, right - 80, y);
+      }
 
-        if (i <= index_) {
-          draw_time(graphics, s.current - s.best, right - 80, y);
-          // TODO fix gold checking
-          if (i < index_ && s.current < s.best) {
-            triforce_->draw(graphics, (time_ / 64) % 3, right - 80, y);
-          }
-        }
-
-      } else if (i <= index_) {
-        if (s.current > 0) {
-          draw_time(graphics, s.current, right, y);
-        } else {
-          text_->draw(graphics, "-", right, y);
-        }
+    } else if (i + offset_ <= index_) {
+      if (s.current > 0) {
+        draw_time(graphics, s.current, right, y);
+      } else {
+        text_->draw(graphics, "-", right, y, Text::Alignment::RIGHT);
       }
     }
   }
@@ -145,13 +138,23 @@ void SplitsScreen::draw(Graphics& graphics) const {
 SplitsScreen::Split::Split(const std::string& name, int hint, unsigned int best) :
   name(name), current(0), best(best), hint(hint) {}
 
+bool SplitsScreen::is_gold_split(int split) const {
+  if (split >= index_) return false;
+  if (split == 0) return splits_[0].current < splits_[0].best;
+
+  const int current = splits_[split].current - splits_[split - 1].current;
+  const int best = splits_[split].best - splits_[split - 1].best;
+
+  return current < best;
+}
+
 void SplitsScreen::stop() {
   running_ = false;
 }
 
 void SplitsScreen::reset() {
   running_ = false;
-  index_ = 0;
+  offset_ = index_ = 0;
   for (size_t i = 0; i < splits_.size(); ++i) splits_[i].current = 0;
   time_ = splits_[0].current = -delay_;
 }
@@ -162,6 +165,7 @@ void SplitsScreen::go() {
 
 void SplitsScreen::next() {
   ++index_;
+  scroll_offset();
 
   if (index_ >= splits_.size()) {
     save();
@@ -173,6 +177,7 @@ void SplitsScreen::skip() {
   if (index_ < splits_.size()) {
     splits_[index_].current = 0;
     ++index_;
+    scroll_offset();
   }
 }
 
@@ -180,9 +185,23 @@ void SplitsScreen::back() {
   if (index_ > 0) {
     splits_[index_].current = 0;
     --index_;
+    scroll_offset();
   } else {
     stop();
   }
+}
+
+void SplitsScreen::scroll_offset() {
+  if (offset_ + visible_ <= index_) offset_ = index_ - visible_ + 1;
+  if (offset_ > index_) offset_ = index_;
+}
+
+void SplitsScreen::scroll_up() {
+  if (offset_ > 0) --offset_;
+}
+
+void SplitsScreen::scroll_down() {
+  if (offset_ + visible_ < splits_.size()) ++offset_;
 }
 
 void SplitsScreen::draw_time(

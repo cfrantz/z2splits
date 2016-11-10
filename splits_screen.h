@@ -32,10 +32,12 @@ class SplitsScreen : public Screen {
 
     std::string title_, file_;
     std::vector<Split> splits_;
-    unsigned int index_, time_, delay_;
+    unsigned int index_, offset_, time_, delay_, visible_;
     bool running_;
     std::unique_ptr<Text> text_;
     std::unique_ptr<SpriteMap> maps_, fairy_, triforce_;
+
+    bool is_gold_split(int split) const;
 
     void stop();
     void reset();
@@ -43,6 +45,10 @@ class SplitsScreen : public Screen {
     void next();
     void skip();
     void back();
+
+    void scroll_offset();
+    void scroll_up();
+    void scroll_down();
 
     void draw_time(Graphics& graphics, int ms, int x, int y) const;
 
