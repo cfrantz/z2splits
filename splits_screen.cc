@@ -51,7 +51,7 @@ void SplitsScreen::save() {
     for (size_t i = 0; i < splits_.size(); ++i) {
       Split s = splits_[i];
       if (s.current < s.best || s.best == 0) s.best = s.current;
-      out << s.hint << " " << s.best << " " << s.name << "\n";
+      out << s.hint << " " << s.best << s.name << "\n";
     }
 
     out.close();
