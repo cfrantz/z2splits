@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
   loader.Load(FLAGS_config);
 
   config.graphics.title = "splits";
-  config.graphics.width = 256;
+  config.graphics.width = 272;
   config.graphics.height = 384;
   config.graphics.fullscreen = false;
 

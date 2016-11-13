@@ -160,13 +160,23 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   return true;
 }
 
-const z2splits::Split* find_same_split(const std::string& name,
-                                       const z2splits::Run& run) {
+const z2splits::Split* SplitsScreen::find_same_split(const std::string& name,
+                                             const z2splits::Run& run) const {
   for(const auto& s : run.splits()) {
     if (name == s.name())
       return &s;
   }
   return nullptr;
+}
+
+bool SplitsScreen::is_gold_split(const z2splits::Split& split) const {
+  const auto* gold = find_same_split(split.name(), saved_runs_.gold());
+  if (gold && gold->time_ms() > 0) {
+    if (split.time_ms() < gold->time_ms()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void SplitsScreen::draw(Graphics& graphics) const {
@@ -191,6 +201,9 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
       if (n <= index_) {
         draw_time(graphics, s.time_ms() - best->time_ms(), right - 80, y);
+        if (is_gold_split(s)) {
+          triforce_->draw(graphics, (time_ / 64) % 3, right - 80, y);
+        }
       }
     } else if (n <= index_) {
       if (s.time_ms() > 0) {

@@ -52,6 +52,9 @@ class SplitsScreen : public Screen {
     void scroll_offset();
     void scroll_up();
     void scroll_down();
+    const z2splits::Split* find_same_split(const std::string& name,
+                                           const z2splits::Run& run) const;
+    bool is_gold_split(const z2splits::Split& split) const;
 
     void load_resources(const z2splits::GameConfig& gcfg);
     void draw_time(Graphics& graphics, int ms, int x, int y) const;

@@ -80,6 +80,7 @@ class File {
   public:
     static std::unique_ptr<File> Open(const string& filename,
                                       const string& mode);
+    static util::Status MkFifo(const string& pathname, int mode=0666);
     static bool GetContents(const string& filename, string* contents);
     static bool SetContents(const string& filename, const string& contents);
 
@@ -93,6 +94,7 @@ class File {
     bool Read(string* buf);
     bool Read(string* buf, int64_t len);
     bool Read(void* buf, int64_t len);
+    bool ReadLine(string* buf);
     bool Write(const string& buf);
     bool Write(const string& buf, int64_t len);
     bool Write(const void* buf, int64_t len);

@@ -40,6 +40,13 @@ std::unique_ptr<File> File::Open(const string& filename,
     return std::unique_ptr<File>(new File(fp));
 }
 
+util::Status File::MkFifo(const string& pathname, int mode) {
+    if (mkfifo(pathname.c_str(), mode) == -1) {
+        return util::PosixStatus(errno);
+    }
+    return util::Status::OK;
+}
+
 bool File::GetContents(const string& filename, string* contents) {
     std::unique_ptr<File> f(Open(filename, "rb"));
     if (f == nullptr)
@@ -99,6 +106,15 @@ bool File::Read(string* buf, int64_t len) {
 
 bool File::Read(string* buf) {
     return Read(buf, Length());
+}
+
+bool File::ReadLine(string* buf) {
+    // FIXME: shouldn't need local copy
+    char local[1024];
+    if (fgets(local, sizeof(local), fp_)) {
+        buf->assign(local);
+    }
+    return !ferror(fp_);
 }
 
 bool File::Write(const void* buf, int64_t len) {
