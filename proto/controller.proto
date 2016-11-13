@@ -252,6 +252,9 @@ enum ControlAction {
     BACK = 2;
     STOP = 3;
     RESET = 4;
+    SKIP = 5;
+    UP = 6;
+    DOWN = 7;
 }
 
 message ControlKeys {

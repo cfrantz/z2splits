@@ -29,18 +29,29 @@ class SplitsScreen : public Screen {
     int category_;
     z2splits::Run run_;
     z2splits::SavedRuns saved_runs_;
-    int index_, time_;
+    int index_;
+    int offset_;
+    int time_;
+    int delay_;
+    int visible_;
     int number_;
     bool running_;
     std::unique_ptr<Text> text_;
     std::unique_ptr<SpriteMap> maps_;
+    std::unique_ptr<SpriteMap> fairy_;
+    std::unique_ptr<SpriteMap> triforce_;
     std::map<std::string, std::unique_ptr<SpriteMap>> images_;
 
     void stop();
     void reset();
     void go();
     void next();
+    void skip();
     void back();
+
+    void scroll_offset();
+    void scroll_up();
+    void scroll_down();
 
     void load_resources(const z2splits::GameConfig& gcfg);
     void draw_time(Graphics& graphics, int ms, int x, int y) const;

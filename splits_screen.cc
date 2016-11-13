@@ -25,6 +25,11 @@ void SplitsScreen::init() {
 
   text_.reset(new Text("text.png"));
   maps_.reset(new SpriteMap("maps.png", 1, 256, 64));
+  fairy_.reset(new SpriteMap("fairy.png", 2, 8, 16));
+  triforce_.reset(new SpriteMap("triforce.png", 3, 8, 16));
+
+  visible_ = 15;
+  reset();
 }
 
 void SplitsScreen::load_resources(const z2splits::GameConfig& gcfg) {
@@ -134,32 +139,34 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     auto* split = run_.mutable_splits(index_);
     split->set_time_ms(split->time_ms() + elapsed);
     time_ += elapsed;
-
-    for(const auto& c : config_.controls()) {
-        action = input.key_pressed(SDL_Scancode(c.scancode())) ?
-                 c.action() : z2splits::ControlAction::UNKNOWN;
-        switch(action) {
-          case z2splits::ControlAction::SPLIT: next(); break;
-          case z2splits::ControlAction::BACK: back(); break;
-          case z2splits::ControlAction::STOP: stop(); break;
-          default:
-            ; // do nothing
-        }
-    }
-  } else {
-    for(const auto& c : config_.controls()) {
-        action = input.key_pressed(SDL_Scancode(c.scancode())) ?
-                 c.action() : z2splits::ControlAction::UNKNOWN;
-        switch(action) {
-          case z2splits::ControlAction::SPLIT: go(); break;
-          case z2splits::ControlAction::RESET: reset(); break;
-          default:
-            ; // do nothing
-        }
-    }
   }
 
+  // FIXME: this is dumb.  Rewrite to use a map.
+  for(const auto& c : config_.controls()) {
+    action = input.key_pressed(SDL_Scancode(c.scancode())) ?
+             c.action() : z2splits::ControlAction::UNKNOWN;
+    if (running_) {
+      if (action == z2splits::ControlAction::SPLIT) next();
+      if (action == z2splits::ControlAction::BACK) back();
+      if (action == z2splits::ControlAction::STOP) stop();
+      if (action == z2splits::ControlAction::SKIP) skip();
+    } else {
+      if (action == z2splits::ControlAction::SPLIT) go();
+    }
+    if (action == z2splits::ControlAction::RESET) reset();
+    if (action == z2splits::ControlAction::UP) scroll_up();
+    if (action == z2splits::ControlAction::DOWN) scroll_down();
+  }
   return true;
+}
+
+const z2splits::Split* find_same_split(const std::string& name,
+                                       const z2splits::Run& run) {
+  for(const auto& s : run.splits()) {
+    if (name == s.name())
+      return &s;
+  }
+  return nullptr;
 }
 
 void SplitsScreen::draw(Graphics& graphics) const {
@@ -168,24 +175,29 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   const int right = graphics.width() - 16;
 
-  int total = 0;
-  int offset = 0;
-  const int max_shown = 16;
+  for (int i = 0; i < visible_; ++i) {
+    int n = i + offset_;
+    if (n >= run_.splits_size()) break;
 
-  if (run_.splits_size() > max_shown) {
-    offset = index_ - max_shown + 1;
-    if (offset < 0) offset = 0;
-  }
+    const z2splits::Split& s = run_.splits(n);
+    const int y = 16 * (i - offset_) + 40;
 
-  for (int i = 0; i < run_.splits_size(); ++i) {
-    const z2splits::Split& s = run_.splits(i);
-    const int y = 16 * (i - offset) + 40;
+    if (n == index_) fairy_->draw(graphics, (time_ / 64) %2, 16, y);
+    text_->draw(graphics, s.name(), 24, y);
 
-    total += s.time_ms();
+    const auto* best = find_same_split(s.name(), saved_runs_.best());
+    if (best && best->time_ms() > 0) {
+      draw_time(graphics, best->time_ms(), right, y);
 
-    if (i >= offset && i < offset + max_shown) {
-      text_->draw(graphics, s.name(), 16, y);
-      if (i <= index_) draw_time(graphics, total, right, y);
+      if (n <= index_) {
+        draw_time(graphics, s.time_ms() - best->time_ms(), right - 80, y);
+      }
+    } else if (n <= index_) {
+      if (s.time_ms() > 0) {
+        draw_time(graphics, s.time_ms(), right, y);
+      } else {
+        text_->draw(graphics, "-", right, y, Text::Alignment::RIGHT);
+      }
     }
   }
 
@@ -235,8 +247,6 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   draw_vline(graphics, 2, 32, graphics.height() - 41);
   draw_vline(graphics, graphics.width() - 6, 32, graphics.height() - 41);
-
-  // TODO draw hint
 }
 
 void SplitsScreen::stop() {
@@ -246,11 +256,13 @@ void SplitsScreen::stop() {
 
 void SplitsScreen::reset() {
   running_ = false;
-  index_ = time_ = 0;
+  offset_ = index_ = 0;
   number_++;
   for (int i = 0; i < run_.splits_size(); ++i) {
-      run_.mutable_splits(i)->set_time_ms(0);
+    run_.mutable_splits(i)->set_time_ms(0);
   }
+  time_ = -delay_;
+  run_.mutable_splits(0)->set_time_ms(time_);
 }
 
 void SplitsScreen::go() {
@@ -259,21 +271,40 @@ void SplitsScreen::go() {
 
 void SplitsScreen::next() {
   ++index_;
+  scroll_offset();
 
   if (index_ >= run_.splits_size()) stop();
 }
 
+void SplitsScreen::skip() {
+  if (index_ < run_.splits_size()) {
+    run_.mutable_splits(index_)->set_time_ms(0);
+    ++index_;
+    scroll_offset();
+  }
+}
+
 void SplitsScreen::back() {
   if (index_ > 0) {
-    auto* split = run_.mutable_splits(index_);
-    auto* last = run_.mutable_splits(index_ - 1);
-
-    last->set_time_ms(last->time_ms() + split->time_ms());
-    split->set_time_ms(0);
+    run_.mutable_splits(index_)->set_time_ms(0);;
     --index_;
+    scroll_offset();
   } else {
     stop();
   }
+}
+
+void SplitsScreen::scroll_offset() {
+  if (offset_ + visible_ <= index_) offset_ = index_ - visible_ + 1;
+  if (offset_ > index_) offset_ = index_;
+}
+
+void SplitsScreen::scroll_up() {
+  if (offset_ > 0) --offset_;
+}
+
+void SplitsScreen::scroll_down() {
+  if (offset_ + visible_ < run_.splits_size()) ++offset_;
 }
 
 void SplitsScreen::draw_time(
