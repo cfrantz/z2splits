@@ -20,4 +20,13 @@ cc_proto_library(
     protoc = "@google_protobuf//:protoc",
 )
 
+cc_proto_library(
+    name = "remote",
+    srcs = [
+        "remote.proto"
+    ],
+    default_runtime = "@google_protobuf//:protobuf",
+    protoc = "@google_protobuf//:protoc",
+)
+
 # vim: ts=4 sw=4 sts=4 expandtab:

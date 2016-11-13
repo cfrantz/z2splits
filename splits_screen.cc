@@ -190,7 +190,7 @@ void SplitsScreen::draw(Graphics& graphics) const {
     if (n >= run_.splits_size()) break;
 
     const z2splits::Split& s = run_.splits(n);
-    const int y = 16 * (i - offset_) + 40;
+    const int y = 16 * (n - offset_) + 40;
 
     if (n == index_) fairy_->draw(graphics, (time_ / 64) %2, 16, y);
     text_->draw(graphics, s.name(), 24, y);
@@ -287,6 +287,17 @@ void SplitsScreen::next() {
   scroll_offset();
 
   if (index_ >= run_.splits_size()) stop();
+}
+
+void SplitsScreen::next(const std::string& nickname) {
+  for(int i=0; i<run_.splits_size(); i++) {
+    if (run_.splits(i).nickname() == nickname) {
+        // FIXME: what to do if player goes out of order?
+        index_ = i;
+        next();
+        break;
+    }
+  }
 }
 
 void SplitsScreen::skip() {

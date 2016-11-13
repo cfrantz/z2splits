@@ -23,6 +23,14 @@ class SplitsScreen : public Screen {
 
     void draw(Graphics& graphics) const;
 
+    void stop();
+    void reset();
+    void go();
+    void next();
+    void next(const std::string& nickname);
+    void skip();
+    void back();
+
   private:
     std::string title_, file_;
     int game_;
@@ -41,13 +49,6 @@ class SplitsScreen : public Screen {
     std::unique_ptr<SpriteMap> fairy_;
     std::unique_ptr<SpriteMap> triforce_;
     std::map<std::string, std::unique_ptr<SpriteMap>> images_;
-
-    void stop();
-    void reset();
-    void go();
-    void next();
-    void skip();
-    void back();
 
     void scroll_offset();
     void scroll_up();

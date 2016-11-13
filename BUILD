@@ -12,6 +12,7 @@ cc_binary(
     deps = [
         ":config",
         ":splits_screen",
+        ":remote",
         "@libgam//:game",
         "//external:gflags",
     ],
@@ -43,5 +44,17 @@ cc_library(
         "//util:logging",
         "//util:os",
         "//proto:config",
+    ],
+)
+
+cc_library(
+    name = "remote",
+    srcs = ["remote.cc"],
+    hdrs = ["remote.h"],
+    deps = [
+        ":splits_screen",
+        "//util:file",
+        "//util:logging",
+        "//proto:remote",
     ],
 )

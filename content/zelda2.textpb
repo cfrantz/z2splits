@@ -16,58 +16,164 @@ game {
             {
                 name: "Magic"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "magic 1"
+            },
+
+            {
+                name: "Shield Spell"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "shield"
+            },
+            {
+                name: "Heart"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "heart 1"
+            },
+
+            {
+                name: "Candle"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "candle"
             },
             {
                 name: "Palace 1"
                 image { origin: LowerLeft id: "map:1" x: 0 y: -72 }
+                nickname: "palace 1"
+            },
+
+            {
+                name: "Jump Spell"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "jump"
             },
             {
-                name: "Saria"
+                name: "Life Spell"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "life"
             },
             {
                 name: "Hammer"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "hammer"
+            },
+            {
+                name: "Spectacle Rock"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "magic 2"
             },
             {
                 name: "Medicine"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "medicine";
             },
             {
-                name: "Mido"
+                name: "Fairy Spell"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "fairy"
+            },
+            {
+                name: "Heart Cave"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "heart 2"
             },
             {
                 name: "Palace 2"
                 image { origin: LowerLeft id: "map:2" x: 0 y: -72 }
+                nickname: "palace 2"
+            },
+            {
+                name: "Glove"
+                image { origin: LowerLeft id: "map:2" x: 0 y: -72 }
+                nickname: "glove"
             },
             {
                 name: "Palace 3"
                 image { origin: LowerLeft id: "map:3" x: 0 y: -72 }
+                nickname: "palace 3"
+            },
+            {
+                name: "Raft"
+                image { origin: LowerLeft id: "map:3" x: 0 y: -72 }
+                nickname: "raft"
+            },
+            {
+                name: "Fire Spell"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "fire"
             },
             {
                 name: "Child"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
             },
             {
-                name: "Darunia"
+                name: "Reflect Spell"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "reflect"
+            },
+            {
+                name: "Maze Island Magic"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "magic 3"
             },
             {
                 name: "Palace 4"
                 image { origin: LowerLeft id: "map:4" x: 0 y: -72 }
+                nickname: "palace 4"
+            },
+            {
+                name: "Boots"
+                image { origin: LowerLeft id: "map:4" x: 0 y: -72 }
+                nickname: "boots"
             },
             {
                 name: "Palace 5"
                 image { origin: LowerLeft id: "map:5" x: 0 y: -72 }
+                nickname: "palace 5"
             },
             {
-                name: "New Kasuto"
+                name: "Flute"
+                image { origin: LowerLeft id: "map:5" x: 0 y: -72 }
+                nickname: "flute"
+            },
+            {
+                name: "Water Heart"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "heart 3"
+            },
+            {
+                name: "Spell Spell"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "spell"
+            },
+            {
+                name: "Magic Key"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "magickey"
+            },
+            {
+                name: "8th Magic Container"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "magic 4"
+            },
+            {
+                name: "Beach Heart"
+                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "heart 4"
             },
             {
                 name: "Palace 6"
                 image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
+                nickname: "palace 6"
+            },
+            {
+                name: "Cross"
+                image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
+                nickname: "cross"
+            },
+            {
+                name: "Thunder Spell"
+                image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
+                nickname: "thunder"
             },
             {
                 name: "Palace 7"

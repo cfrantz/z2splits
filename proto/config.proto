@@ -44,6 +44,7 @@ message Split {
     string name = 1;
     DisplayImage image = 2;
     int32 time_ms = 3;
+    string nickname = 4;
 }
 
 message CategoryConfig {

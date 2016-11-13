@@ -1,0 +1,8 @@
+syntax = "proto3";
+package z2splits;
+
+message RemoteCommand {
+    string command = 1;
+    int32 frame = 2;
+    repeated string data = 3;
+}
