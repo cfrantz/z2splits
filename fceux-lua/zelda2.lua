@@ -33,9 +33,6 @@ end
 
 local state = reset_state();
 
-remote = io.open("/tmp/z2splits", "w");
-io.output(remote);
-
 while (running) do
     local frame = {};
 
