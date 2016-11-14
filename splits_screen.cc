@@ -29,6 +29,7 @@ void SplitsScreen::init() {
   triforce_.reset(new SpriteMap("triforce.png", 3, 8, 16));
 
   visible_ = 15;
+  delta_ = true;
   reset();
 }
 
@@ -58,6 +59,8 @@ bool SplitsScreen::load_splits(const z2splits::Config& config) {
   const z2splits::CategoryConfig& ccfg = gcfg.category(category_);
 
   title_ = gcfg.name() + ": " + ccfg.name();
+  delay_ = ccfg.start_delay();
+  time_ = -delay_;
 
   load_resources(gcfg);
   *run_.mutable_splits() = ccfg.splits();
@@ -156,6 +159,7 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
     if (action == z2splits::ControlAction::RESET) reset();
     if (action == z2splits::ControlAction::UP) scroll_up();
     if (action == z2splits::ControlAction::DOWN) scroll_down();
+    if (action == z2splits::ControlAction::TOGGLE_DELTA) delta_ = !delta_;
   }
   return true;
 }
@@ -185,9 +189,13 @@ void SplitsScreen::draw(Graphics& graphics) const {
 
   const int right = graphics.width() - 16;
 
-  for (int i = 0; i < visible_; ++i) {
-    int n = i + offset_;
-    if (n >= run_.splits_size()) break;
+  int total_time = 0;
+  for (int n = 0; n < run_.splits_size(); ++n) {
+    int i = n - offset_;
+    int tm = run_.splits(n).time_ms();
+    total_time += tm;
+    if (i < 0 || i >= visible_)
+        continue;
 
     const z2splits::Split& s = run_.splits(n);
     const int y = 16 * (n - offset_) + 40;
@@ -206,10 +214,11 @@ void SplitsScreen::draw(Graphics& graphics) const {
         }
       }
     } else if (n <= index_) {
-      if (s.time_ms() > 0) {
-        draw_time(graphics, s.time_ms(), right, y);
-      } else {
+      if (s.time_ms() == 0) {
         text_->draw(graphics, "-", right, y, Text::Alignment::RIGHT);
+      } else {
+        tm = delta_ ? s.time_ms() : total_time;
+        draw_time(graphics, tm, right, y);
       }
     }
   }

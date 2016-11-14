@@ -255,6 +255,7 @@ enum ControlAction {
     SKIP = 5;
     UP = 6;
     DOWN = 7;
+    TOGGLE_DELTA = 8;
 }
 
 message ControlKeys {

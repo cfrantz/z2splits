@@ -51,6 +51,7 @@ message CategoryConfig {
     string name = 1;
     string save_filename = 2;
     repeated Split splits = 3;
+    int32 start_delay = 4;
 }
 
 message GameConfig {

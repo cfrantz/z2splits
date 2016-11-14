@@ -44,6 +44,7 @@ class SplitsScreen : public Screen {
     int visible_;
     int number_;
     bool running_;
+    bool delta_;
     std::unique_ptr<Text> text_;
     std::unique_ptr<SpriteMap> maps_;
     std::unique_ptr<SpriteMap> fairy_;
