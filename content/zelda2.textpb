@@ -12,6 +12,7 @@ game {
     }
     category {
         name: "All Keys"
+        start_delay: 2700
         splits: [
             {
                 name: "Magic"
@@ -77,24 +78,24 @@ game {
                 nickname: "heart 2"
             },
             {
-                name: "Palace 2"
-                image { origin: LowerLeft id: "map:2" x: 0 y: -72 }
-                nickname: "palace 2"
-            },
-            {
                 name: "Glove"
                 image { origin: LowerLeft id: "map:2" x: 0 y: -72 }
                 nickname: "glove"
             },
             {
-                name: "Palace 3"
-                image { origin: LowerLeft id: "map:3" x: 0 y: -72 }
-                nickname: "palace 3"
+                name: "Palace 2"
+                image { origin: LowerLeft id: "map:2" x: 0 y: -72 }
+                nickname: "palace 2"
             },
             {
                 name: "Raft"
                 image { origin: LowerLeft id: "map:3" x: 0 y: -72 }
                 nickname: "raft"
+            },
+            {
+                name: "Palace 3"
+                image { origin: LowerLeft id: "map:3" x: 0 y: -72 }
+                nickname: "palace 3"
             },
             {
                 name: "Fire Spell"
@@ -116,24 +117,24 @@ game {
                 nickname: "magic 3"
             },
             {
-                name: "Palace 4"
-                image { origin: LowerLeft id: "map:4" x: 0 y: -72 }
-                nickname: "palace 4"
-            },
-            {
                 name: "Boots"
                 image { origin: LowerLeft id: "map:4" x: 0 y: -72 }
                 nickname: "boots"
             },
             {
-                name: "Palace 5"
-                image { origin: LowerLeft id: "map:5" x: 0 y: -72 }
-                nickname: "palace 5"
+                name: "Palace 4"
+                image { origin: LowerLeft id: "map:4" x: 0 y: -72 }
+                nickname: "palace 4"
             },
             {
                 name: "Flute"
                 image { origin: LowerLeft id: "map:5" x: 0 y: -72 }
                 nickname: "flute"
+            },
+            {
+                name: "Palace 5"
+                image { origin: LowerLeft id: "map:5" x: 0 y: -72 }
+                nickname: "palace 5"
             },
             {
                 name: "Water Heart"
@@ -161,14 +162,14 @@ game {
                 nickname: "heart 4"
             },
             {
-                name: "Palace 6"
-                image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
-                nickname: "palace 6"
-            },
-            {
                 name: "Cross"
                 image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
                 nickname: "cross"
+            },
+            {
+                name: "Palace 6"
+                image { origin: LowerLeft id: "map:6" x: 0 y: -72 }
+                nickname: "palace 6"
             },
             {
                 name: "Thunder Spell"
