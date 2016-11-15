@@ -28,6 +28,15 @@ function reset_state()
     state["hammer"] = 0;
     state["magickey"] = 0;
 
+    state["downstab"] = 0;
+    state["upstab"] = 0;
+    state["trophy"] = 0;
+    state["medicine"] = 0;
+    state["mirror"] = 0;
+    state["bagu"] = 0;
+    state["water"] = 0;
+    state["child"] = 0;
+
     return state;
 end
 
@@ -57,6 +66,15 @@ while (running) do
     frame["cross"] =    memory.readbyte(0x78a);
     frame["hammer"] =   memory.readbyte(0x78b);
     frame["magickey"] = memory.readbyte(0x78c);
+
+    state["downstab"] = AND(memory.readbyte(0x796), 0x10);
+    state["upstab"] = AND(memory.readbyte(0x796), 0x04);
+    state["trophy"] = AND(memory.readbyte(0x798), 0x10);
+    state["mirror"] = AND(memory.readbyte(0x799), 0x01);
+    state["medicine"] = AND(memory.readbyte(0x79a), 0x04);
+    state["bagu"] = AND(memory.readbyte(0x79a), 0x08);
+    state["water"] = AND(memory.readbyte(0x79b), 0x01);
+    state["child"] = AND(memory.readbyte(0x79c), 0x02);
 
     if tick > 10 then
         remote = io.open("/tmp/z2splits", "w");

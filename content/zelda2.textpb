@@ -33,7 +33,7 @@ game {
 
             {
                 name: "Candle"
-                image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                image { origin: LowerLeft id: "map:1" x: 0 y: -72 }
                 nickname: "candle"
             },
             {
@@ -105,6 +105,7 @@ game {
             {
                 name: "Child"
                 image { origin: LowerLeft id: "map:0" x: 0 y: -72 }
+                nickname: "child"
             },
             {
                 name: "Reflect Spell"
