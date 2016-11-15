@@ -132,9 +132,7 @@ std::map<int, Code> posix_errors = {
 } // namespace error
 
 string StrError(int error) {
-    char buf[1024];
-    strerror_r(error, buf, sizeof(buf));
-    return string(buf);
+    return string(strerror(error));
 }
 
 Status PosixStatus(int error) {
