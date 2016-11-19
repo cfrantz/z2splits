@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sched.h>
+#include <time.h>
 
 #include "util/os.h"
 
@@ -42,4 +43,15 @@ string Join(const std::vector<string>& components) {
 }
 
 } // namespace path
+
+std::string StrFTime(const char *format, struct tm* tm) {
+    char outstr[200];
+    if (tm == nullptr) {
+        time_t t = time(nullptr);
+        tm = localtime(&t);
+    }
+    strftime(outstr, sizeof(outstr), format, tm);
+    return std::string(outstr);
+}
+
 } // namespace os
