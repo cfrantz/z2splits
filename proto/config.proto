@@ -62,7 +62,8 @@ message GameConfig {
 
 message Run {
     int32 number = 1;
-    repeated Split splits = 2;
+    string datetime = 2;
+    repeated Split splits = 3;
 }
 
 message SavedRuns {

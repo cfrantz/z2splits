@@ -139,9 +139,9 @@ void SplitsScreen::save_splits() {
 bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
   z2splits::ControlAction action;
   if (running_) {
-    auto* split = run_.mutable_splits(index_);
-    split->set_time_ms(split->time_ms() + elapsed);
     time_ += elapsed;
+    auto* split = run_.mutable_splits(index_);
+    split->set_time_ms(time_);
   }
 
   // FIXME: this is dumb.  Rewrite to use a map.
@@ -184,41 +184,57 @@ bool SplitsScreen::is_gold_split(const z2splits::Split& split) const {
 }
 
 void SplitsScreen::draw(Graphics& graphics) const {
-  text_->draw(
-      graphics, title_, graphics.width() / 2, 8, Text::Alignment::CENTER);
-
   const int right = graphics.width() - 16;
+  std::string title = StrCat(title_, " #", run_.number());
+  text_->draw(
+      graphics, title, graphics.width() / 2, 8, Text::Alignment::CENTER);
 
-  int total_time = 0;
+  // split name, current, gold, p.b.
+  text_->draw(graphics, "Split", 24, 32);
+  text_->draw(graphics, "Cur", right-184, 32);
+  text_->draw(graphics, "Gold",right-112, 32);
+  text_->draw(graphics, "P.B.",right-32, 32);
+
+  int last_time = 0, last_best = 0, last_gold = 0;
+  int tm;
   for (int n = 0; n < run_.splits_size(); ++n) {
     int i = n - offset_;
-    int tm = run_.splits(n).time_ms();
-    total_time += tm;
+    if (n > 0)
+        last_time = run_.splits(n-1).time_ms();
     if (i < 0 || i >= visible_)
         continue;
 
     const z2splits::Split& s = run_.splits(n);
-    const int y = 16 * (n - offset_) + 40;
+    const int y = 16 * (n - offset_) + 60;
 
-    if (n == index_) fairy_->draw(graphics, (time_ / 64) %2, 16, y);
+    if (n == index_) fairy_->draw(graphics, unsigned(time_ / 64) %2, 16, y);
     text_->draw(graphics, s.name(), 24, y);
 
     const auto* best = find_same_split(s.name(), saved_runs_.best());
-    if (best && best->time_ms() > 0) {
-      draw_time(graphics, best->time_ms(), right, y);
+    if (best) {
+      tm = best->time_ms();
+      if (tm > 0)
+          draw_time(graphics, delta_ ? tm - last_best: tm, right, y);
+      last_best = tm;
+    }
 
-      if (n <= index_) {
-        draw_time(graphics, s.time_ms() - best->time_ms(), right - 80, y);
-        if (is_gold_split(s)) {
-          triforce_->draw(graphics, (time_ / 64) % 3, right - 80, y);
-        }
-      }
-    } else if (n <= index_) {
-      if (s.time_ms() == 0) {
-        text_->draw(graphics, "-", right, y, Text::Alignment::RIGHT);
+    const auto* gold = find_same_split(s.name(), saved_runs_.gold());
+    if (gold) {
+      tm = gold->time_ms();
+      if (tm > 0)
+          draw_time(graphics, delta_ ? tm - last_gold: tm, right - 80, y);
+      last_gold = tm;
+    }
+
+    if (n <= index_) {
+      tm = s.time_ms();
+      if (tm == 0) {
+        text_->draw(graphics, "-", right - 160, y, Text::Alignment::RIGHT);
       } else {
-        tm = delta_ ? s.time_ms() : total_time;
-        draw_time(graphics, tm, right, y);
+        draw_time(graphics, delta_ ? tm - last_time: tm, right - 160, y);
+        if (n < index_ && is_gold_split(s)) {
+            triforce_->draw(graphics, unsigned(time_ / 64) % 3, right-160, y);
+        }
       }
     }
   }
@@ -260,6 +276,13 @@ void SplitsScreen::draw(Graphics& graphics) const {
   draw_corner(graphics, graphics.width() - 7, 25);
   draw_hline(graphics, 8, 26, graphics.width() - 17);
 
+  draw_vline(graphics, 2, 32, 16);
+  draw_vline(graphics, graphics.width() - 6, 32, 16);
+
+  draw_corner(graphics, 1, 50);
+  draw_corner(graphics, graphics.width() - 7, 50);
+  draw_hline(graphics, 8, 51, graphics.width() - 17);
+
   draw_corner(graphics, 1, graphics.height() - 7);
   draw_corner(graphics, graphics.width() - 7, graphics.height() - 7);
   draw_hline(graphics, 8, graphics.height() - 6, graphics.width() - 17);
@@ -267,8 +290,8 @@ void SplitsScreen::draw(Graphics& graphics) const {
   draw_vline(graphics, 2, 8, 15);
   draw_vline(graphics, graphics.width() - 6, 8, 15);
 
-  draw_vline(graphics, 2, 32, graphics.height() - 41);
-  draw_vline(graphics, graphics.width() - 6, 32, graphics.height() - 41);
+  draw_vline(graphics, 2, 57, graphics.height() - 66);
+  draw_vline(graphics, graphics.width() - 6, 57, graphics.height() - 66);
 }
 
 void SplitsScreen::stop() {
@@ -289,6 +312,8 @@ void SplitsScreen::reset() {
 
 void SplitsScreen::go() {
   if (index_ < run_.splits_size()) running_ = true;
+  run_.set_number(number_);
+  run_.set_datetime(os::StrFTime("%Y-%m-%d %H:%M:%S %Z"));
 }
 
 void SplitsScreen::next() {
