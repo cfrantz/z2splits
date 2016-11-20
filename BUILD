@@ -58,3 +58,16 @@ cc_library(
         "//proto:remote",
     ],
 )
+
+cc_binary(
+    name = "fixsplits",
+    linkopts = [
+    ],
+    srcs = ["fixsplits.cc"],
+    deps = [
+        "//proto:config",
+        "//external:gflags",
+        "//util:file",
+        "//util:logging",
+    ],
+)
