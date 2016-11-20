@@ -92,6 +92,7 @@ bool SplitsScreen::load_splits(const z2splits::Config& config) {
     LOG(WARN, "Couldn't load saved splits from '", ccfg.save_filename(), "'");
   }
 
+  view_number_ = number_;
   return true;
 }
 
@@ -155,6 +156,8 @@ bool SplitsScreen::update(const Input& input, Audio&, unsigned int elapsed) {
       if (action == z2splits::ControlAction::SKIP) skip();
     } else {
       if (action == z2splits::ControlAction::SPLIT) go();
+      if (action == z2splits::ControlAction::VIEW_DOWN) view(-1);
+      if (action == z2splits::ControlAction::VIEW_UP) view(1);
     }
     if (action == z2splits::ControlAction::RESET) reset();
     if (action == z2splits::ControlAction::UP) scroll_up();
@@ -312,6 +315,7 @@ void SplitsScreen::reset() {
 
 void SplitsScreen::go() {
   if (index_ < run_.splits_size()) running_ = true;
+  view_number_ = number_;
   run_.set_number(number_);
   run_.set_datetime(os::StrFTime("%Y-%m-%d %H:%M:%S %Z"));
 }
@@ -350,6 +354,11 @@ void SplitsScreen::back() {
   } else {
     stop();
   }
+}
+
+void SplitsScreen::view(int dir) {
+    view_number_ = unsigned(view_number_ + dir) % saved_runs_.run_size();
+    run_ = saved_runs_.run(view_number_);
 }
 
 void SplitsScreen::scroll_offset() {

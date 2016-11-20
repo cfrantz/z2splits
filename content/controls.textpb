@@ -6,5 +6,7 @@ controls: [
     { scancode: SDL_SCANCODE_TAB action: SKIP },
     { scancode: SDL_SCANCODE_UP action: UP },
     { scancode: SDL_SCANCODE_DOWN action: DOWN },
-    { scancode: SDL_SCANCODE_D action: TOGGLE_DELTA }
+    { scancode: SDL_SCANCODE_D action: TOGGLE_DELTA },
+    { scancode: SDL_SCANCODE_RIGHT action: VIEW_UP },
+    { scancode: SDL_SCANCODE_LEFT action: VIEW_DOWN }
 ]

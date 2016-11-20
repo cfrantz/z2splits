@@ -30,6 +30,7 @@ class SplitsScreen : public Screen {
     void next(const std::string& nickname);
     void skip();
     void back();
+    void view(int dir);
 
   private:
     std::string title_, file_;
@@ -43,6 +44,7 @@ class SplitsScreen : public Screen {
     int delay_;
     int visible_;
     int number_;
+    int view_number_;
     bool running_;
     bool delta_;
     std::unique_ptr<Text> text_;

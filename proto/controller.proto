@@ -256,6 +256,8 @@ enum ControlAction {
     UP = 6;
     DOWN = 7;
     TOGGLE_DELTA = 8;
+    VIEW_DOWN = 9;
+    VIEW_UP = 10;
 }
 
 message ControlKeys {
